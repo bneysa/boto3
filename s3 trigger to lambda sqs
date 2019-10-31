@@ -1,0 +1,22 @@
+import boto3
+import os
+
+def lambda_handler(event, context):
+    sqs = boto3.client('sqs')
+
+    queue_url = 'https://'
+
+
+    bucket = event['Records'][0]['s3']['bucket']['name']
+    key =    event['Records'][0]['s3']['object']['key']
+    name, ext = os.path.splitext(key)
+    print(name)
+    print(ext)
+    print(bucket)
+    print(key)
+    
+    sqs.send_message(
+    QueueUrl=queue_url,
+    DelaySeconds=10,
+    MessageBody=(f"{name} {ext}")
+)

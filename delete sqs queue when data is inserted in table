@@ -1,0 +1,52 @@
+import boto3
+import MySQLdb
+import logging
+# Get the service resource
+sqs = boto3.client('sqs',region_name='us-east-1')
+queue_url=''
+
+name=""
+extension=""
+messages = sqs.receive_message(
+    QueueUrl=queue_url,
+    MaxNumberOfMessages=1,
+    VisibilityTimeout=0,
+    WaitTimeSeconds=0
+)
+if 'Messages' in messages:
+        for message in messages['Messages']:
+                print(message['Body'])
+                a=message['Body']
+                b=a.split(" ")
+                name=b[0]
+                extension=b[1]
+else:
+        print("Queue empty")
+db = MySQLdb.connect(host="localhost",    # your host, usually localhost
+                     port=3306,
+                     user="",         # your username
+                     passwd="",  # your password
+                     db="")        # name of the data base
+
+# you must create a Cursor object. It will let
+#  you execute all the queries you need
+cur = db.cursor()
+
+
+sqlinfo="""INSERT INTO info_Table (,) VALUES (%s,%s)"""
+
+try:
+        if 'Messages' in messages:
+                for message in messages['Messages']:
+                        count=cur.execute(sqlinfo,(name,extension))
+                        db.commit()
+                        logging.warn("%d", count)
+                        logging.info("inserted values %d, %s", name, extension)
+                        print("Successful")
+                        sqs.delete_message(QueueUrl=queue_url,ReceiptHandle=message['ReceiptHandle'])
+
+
+except MySQLdb.IntegrityError:
+    logging.warn("failed to insert values %d, %s", name, extension)
+finally:
+   db.close()

@@ -11,13 +11,13 @@ def lambda_handler(event, context):
     client = boto3.client('sns')
     if(a=="ObjectCreated:Put"):
         response=client.publish(
-        TopicArn = 'arn:aws:sns:us-east-1:085687130119:s3topic',
+        TopicArn = 'arn:',
         Subject = 'File uploaded: ' + key,
         Message = key + 'File was uploaded to bucket:' + bucket
     )
     elif(a=="ObjectRemoved:Delete"):
         response=client.publish(
-        TopicArn = 'arn:aws:sns:us-east-1:085687130119:s3topic',
+        TopicArn = 'arn:',
         Subject = 'File deleted: ' + key,
         Message = key + 'File was deleted in bucket:' + bucket
     )

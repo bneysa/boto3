@@ -1,0 +1,45 @@
+
+
+function GetFromDatabase() {
+    var USERNAME = document.getElementById("mainemail").value;
+    var api = "";
+
+
+    console.log(USERNAME);
+
+
+
+    var params = {
+        "Username": USERNAME
+    };
+
+
+
+    var xhttp = new XMLHttpRequest();
+
+    xhttp.open("POST", api, false);
+
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+
+            console.log(xhttp.responseText)
+            var data = JSON.parse(xhttp.responseText);
+
+            alert(data);
+            document.getElementById('sesData').innerHTML = data;
+
+        }
+
+
+    };
+    xhttp.send(JSON.stringify(params));
+
+
+
+
+
+
+
+
+}
+

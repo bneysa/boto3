@@ -1,0 +1,40 @@
+import json
+import boto3
+
+dynamodb = boto3.client('dynamodb')
+client = boto3.client('secretsmanager')
+
+def lambda_handler(event, context):
+
+    email=event["Username"]
+  
+    resp = dynamodb.get_item(
+    Key={
+        'email': {'S': email}
+        
+      }, 
+       
+       
+    TableName='Users'
+  )
+
+    resp1 = json.dumps(resp)
+    
+    arn = resp['Item']['arn']['S']
+    
+    # print(arn)
+   
+    response = client.get_secret_value(
+    SecretId=arn)
+    
+    b=(response['SecretString'])
+    r=json.loads(b)
+    password=r[email]
+    return password
+   
+    
+    
+    
+
+    
+   

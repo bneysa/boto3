@@ -1,0 +1,83 @@
+import boto3
+import PIL
+from PIL import Image
+from io import BytesIO
+from os import path
+import json
+from boto3.s3.transfer import S3Transfer
+
+s3 = boto3.resource('s3')
+origin_bucket = ''
+destination_bucket = ''
+width_size = 200
+
+
+def lambda_handler(event, context):
+    print(event)
+    key=event['detail']['resources'][0]['ARN']
+    print(key)
+    
+    x = key.split("/")
+    keyoffile=x[-1]
+    print(keyoffile)
+    extension = path.splitext(keyoffile)[1].lower()
+    print(extension)
+    
+    obj = s3.Object(
+        bucket_name=origin_bucket,
+        key=keyoffile
+        )
+   
+    obj_body = obj.get()['Body'].read()
+    
+    if extension in ['.jpeg', '.jpg']:
+            format = 'JPEG'
+    if extension in ['.png']:
+            format = 'PNG'
+            
+    img = Image.open(BytesIO(obj_body))
+    wpercent = (width_size / float(img.size[0]))
+    hsize = int((float(img.size[1]) * float(wpercent)))
+    img = img.resize((width_size, hsize), PIL.Image.ANTIALIAS)
+    buffer = BytesIO()
+    img.save(buffer, format)
+    buffer.seek(0)
+    
+    print(img)
+    
+    obj = s3.Object(
+        bucket_name=destination_bucket,
+        key=keyoffile,
+        )
+    obj.put(Body=buffer)
+
+        # Printing to CloudWatch
+    print('File saved at {}/{}'.format(
+        destination_bucket,
+        keyoffile,
+        ))
+    s3_client = boto3.client('s3')
+    transfer = S3Transfer(s3_client)
+    file_url = '%s/%s/%s' % (s3_client.meta.endpoint_url, origin_bucket, keyoffile)
+    file_url2 = '%s/%s/%s' % (s3_client.meta.endpoint_url, destination_bucket, keyoffile)
+    print(file_url)
+    
+    # params = {'Bucket': origin_bucket, 'Key': keyoffile}
+    # url = s3_client.generate_presigned_url('get_object', params)
+    # print url
+    
+    
+    # config.signature_version = botocore.UNSIGNED
+
+    # params2 = {'Bucket': destination_bucket, 'Key': keyoffile}
+    # url2 = s3_client.generate_presigned_url('get_object', params2)
+    # print url2    
+        
+    Dict = {'original': keyoffile, 'thumbnail': keyoffile, 'urloforiginal': file_url ,'urlofthumbnail':file_url2} 
+    
+    return Dict
+    
+        
+    
+   
+   

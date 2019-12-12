@@ -1,0 +1,13 @@
+import boto3
+
+
+def lambda_handler(event, context):
+# TODO implement
+s3 = boto3.client('s3')
+s3.create_bucket(Bucket='lamdas3latest')
+
+
+filename = ''
+bucket_name = ''
+
+s3.upload_file(filename, bucket_name, filename)

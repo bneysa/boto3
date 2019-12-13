@@ -1,0 +1,6 @@
+  a=[]
+    for key in s3_client.list_objects(Bucket=origin_bucket)['Contents']:
+         a.append(key['Key'])
+         
+    print(a)
+    print(a[1])

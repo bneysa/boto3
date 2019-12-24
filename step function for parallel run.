@@ -1,0 +1,43 @@
+{
+  "Comment": "A simple AWS Step Functions state machine.",
+  "StartAt": "InvokeService",
+  "States": {
+    "InvokeService": {
+        "Type" : "Parallel",
+        "Branches": [
+          {
+            "StartAt" : "InvokeService1",
+            "States": {
+              "InvokeService1" : {
+                "Type": "Task" ,
+        "Resource":"arn:",
+                "End": true
+              }
+            }
+            
+ },
+ {
+         "StartAt": "Parallellambda",
+         "States": {
+           "Parallellambda": {
+             "Type": "Task",
+             "Resource":
+               "arn:",
+               "End": true
+            
+           }
+         }
+ }
+          ],
+     
+        "Next" : "Passtonextfunction"
+    },
+          
+     
+    "Passtonextfunction": {
+      "Type": "Task",
+      "Resource": "arn:
+      "End": true
+    }
+  }
+}
